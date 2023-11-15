@@ -16,7 +16,7 @@ const TV_MAZE_BASE_URL = "http://api.tvmaze.com"
 async function getShowsByTerm(term) {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
 
-  console.log("Search param is ", term);
+  //console.log("Search param is ", term);
 
   const query = new URLSearchParams({
     q: term
@@ -24,26 +24,30 @@ async function getShowsByTerm(term) {
 
   const resource = await fetch(`${TV_MAZE_BASE_URL}/search/shows/?${query}`);
 
-  console.log("Search result is ", resource);
 
-  //   return [
-  //   {
-  //     id: 1767,
-  //     name: "The Bletchley Circle",
-  //     summary:
-  //       `<p><b>The Bletchley Circle</b> follows the journey of four ordinary
-  //          women with extraordinary skills that helped to end World War II.</p>
-  //        <p>Set in 1952, Susan, Millie, Lucy and Jean have returned to their
-  //          normal lives, modestly setting aside the part they played in
-  //          producing crucial intelligence, which helped the Allies to victory
-  //          and shortened the war. When Susan discovers a hidden code behind an
-  //          unsolved murder she is met by skepticism from the police. She
-  //          quickly realises she can only begin to crack the murders and bring
-  //          the culprit to justice with her former friends.</p>`,
-  //     image:
-  //         "http://static.tvmaze.com/uploads/images/medium_portrait/147/369403.jpg"
-  //   }
-  // ]
+  const data = await resource.json();
+
+  const showInfo = [];
+  for(let obj of data){
+    const showObj = {
+      id: obj.show.id,
+      name: obj.show.name,
+      summary: obj.show.summary,
+    }
+
+    if(obj["image"] === null){
+      showObj["image"] = "https://tinyurl.com/tv-missing";
+    } else {
+      showObj["image"] = obj.show.image.medium;
+    }
+    showInfo.push(showObj);
+  }
+
+  //image: obj.show.image.medium
+  console.log("Search result is ", resource, "data=", data);
+  console.log("showInfo = ", showInfo);
+  return showInfo;
+
 }
 
 
@@ -60,8 +64,8 @@ function displayShows(shows) {
         <div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
-              src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg"
-              alt="Bletchly Circle San Francisco"
+              src= "${show.image}"
+              alt="${show.name}"
               class="w-25 me-3">
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
