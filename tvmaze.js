@@ -85,6 +85,10 @@ function displayShows(shows) {
   }
 }
 
+/**add click handler for episode button */
+function addEpisodeButtonHandler(){
+  $(".Show-getEpisodes").on("click", handleEpisodeClick);
+}
 
 /** Handle search form submission: get shows from API and display.
  *    Hide episodes area (that only gets shown if they ask for episodes)
@@ -96,6 +100,7 @@ async function searchShowsAndDisplay() {
 
   //$episodesArea.hide();
   displayShows(shows);
+  addEpisodeButtonHandler();
 }
 
 $searchForm.on("submit", async function handleSearchForm(evt) {
@@ -128,7 +133,9 @@ async function getEpisodesOfShow(id) {
   return episodesInfo;
 }
 
-/** Write a clear docstring for this function... */
+/**Takes an array of episodes and appends episode information as unordered list
+ * to the episodeList area
+ */
 
 function displayEpisodes(episodes) {
   for (let episode of episodes){
@@ -137,5 +144,22 @@ function displayEpisodes(episodes) {
         , number ${episode.number})</li>`);
   }
 }
+
+/**Takes a show ID searches and displays list of episode info */
+async function getEpisodesAndDisplay(showId){
+  const episodesInfoData = await getEpisodesOfShow(showId); //is an array
+  displayEpisodes(episodesInfoData);
+  //console.log("we got here");
+}
+
+
+
+function handleEpisodeClick(evt){
+  evt.preventDefault();
+  //console.log("I'm clicked");
+  getEpisodesAndDisplay()
+}
+
+
 
 // add other functions that will be useful / match our structure & design
