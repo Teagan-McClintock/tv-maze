@@ -2,9 +2,11 @@
 
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
+const $episodesList = $("#episodesList");
 const $searchForm = $("#searchForm");
 
 const TV_MAZE_BASE_URL = "http://api.tvmaze.com";
+const MISSING_IMAGE_URL = "https://tinyurl.com/tv-missing";
 
 /** Given a search term, search for tv shows that match that query.
  *
@@ -22,33 +24,32 @@ async function getShowsByTerm(term) {
     q: term
   });
 
-  const resource = await fetch(`${TV_MAZE_BASE_URL}/search/shows/?${query}`);
+  const response = await fetch(`${TV_MAZE_BASE_URL}/search/shows/?${query}`);
+  const showsDataFromAPI = await response.json();
 
-
-  const data = await resource.json();
-
-  const showInfo = [];
-  for (let obj of data) {
-    const showObj = {
-      id: obj.show.id,
-      name: obj.show.name,
-      summary: obj.show.summary,
+  const showsInfo = [];
+  for (let showSearchResult of showsDataFromAPI) {
+    console.log(showSearchResult);
+    const showInfoObj = {
+      id: showSearchResult.show.id,
+      name: showSearchResult.show.name,
+      summary: showSearchResult.show.summary,
     };
 
     //console.log("obj.show.image = ", obj.show.image);
 
-    if (obj.show.image === null) {
-      showObj["image"] = "https://tinyurl.com/tv-missing";
+    if (showSearchResult.show.image === null) {
+      showInfoObj["image"] = MISSING_IMAGE_URL;
     } else {
-      showObj["image"] = obj.show.image.medium;
+      showInfoObj["image"] = showSearchResult.show.image.medium;
     }
-    showInfo.push(showObj);
+    showsInfo.push(showInfoObj);
   }
 
   //image: obj.show.image.medium
   //console.log("Search result is ", resource, "data=", data);
   //console.log("showInfo = ", showInfo);
-  return showInfo;
+  return showsInfo;
 
 }
 
@@ -93,7 +94,7 @@ async function searchShowsAndDisplay() {
   const term = $("#searchForm-term").val();
   const shows = await getShowsByTerm(term);
 
-  $episodesArea.hide();
+  //$episodesArea.hide();
   displayShows(shows);
 }
 
@@ -107,10 +108,34 @@ $searchForm.on("submit", async function handleSearchForm(evt) {
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
+async function getEpisodesOfShow(id) {
+  const episodeResponse =
+    await fetch(`${TV_MAZE_BASE_URL}/shows/${id}/episodes`);
+  const episodeDataFromAPI = await episodeResponse.json();
+
+  const episodesInfo = []
+  for (const episodeSearchResult of episodeDataFromAPI){
+    const episodeInfoObj = {
+      id: episodeSearchResult.id,
+      name: episodeSearchResult.name,
+      season: episodeSearchResult.season,
+      number: episodeSearchResult.number
+    }
+    episodesInfo.push(episodeInfoObj);
+  }
+  console.log("episodesInfo = ", episodesInfo);
+
+  return episodesInfo;
+}
 
 /** Write a clear docstring for this function... */
 
-// function displayEpisodes(episodes) { }
+function displayEpisodes(episodes) {
+  for (let episode of episodes){
+    console.log(episode);
+    $episodesList.append(`<li>${episode.name} (season ${episode.season}
+        , number ${episode.number})</li>`);
+  }
+}
 
 // add other functions that will be useful / match our structure & design
