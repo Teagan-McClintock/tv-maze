@@ -86,9 +86,9 @@ function displayShows(shows) {
 }
 
 /**add click handler for episode button */
-function addEpisodeButtonHandler(){
-  $(".Show-getEpisodes").on("click", handleEpisodeClick);
-}
+
+$("#showsList").on("click", "button", handleEpisodeClick);
+
 
 /** Handle search form submission: get shows from API and display.
  *    Hide episodes area (that only gets shown if they ask for episodes)
@@ -100,7 +100,7 @@ async function searchShowsAndDisplay() {
 
   //$episodesArea.hide();
   displayShows(shows);
-  addEpisodeButtonHandler();
+  //addEpisodeButtonHandler();
 }
 
 $searchForm.on("submit", async function handleSearchForm(evt) {
@@ -142,6 +142,7 @@ function displayEpisodes(episodes) {
     console.log(episode);
     $episodesList.append(`<li>${episode.name} (season ${episode.season}
         , number ${episode.number})</li>`);
+    $("#episodesArea").css("display", "inherit");
   }
 }
 
@@ -156,9 +157,17 @@ async function getEpisodesAndDisplay(showId){
 
 function handleEpisodeClick(evt){
   evt.preventDefault();
-  //console.log("I'm clicked");
-  getEpisodesAndDisplay()
+  const clickedButton = $(evt.target);
+  console.log("I'm clicked ", clickedButton);
+  console.log("data at closest .Show = ", clickedButton.closest(".Show").data("show-id"));
+  //
+  const showID = clickedButton.closest(".Show").data("show-id")
+  getEpisodesAndDisplay(showID);
 }
+
+// function getShowId(evt){
+
+// }
 
 
 
