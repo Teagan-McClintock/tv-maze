@@ -4,7 +4,7 @@ const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 
-const TV_MAZE_BASE_URL = "http://api.tvmaze.com"
+const TV_MAZE_BASE_URL = "http://api.tvmaze.com";
 
 /** Given a search term, search for tv shows that match that query.
  *
@@ -28,14 +28,16 @@ async function getShowsByTerm(term) {
   const data = await resource.json();
 
   const showInfo = [];
-  for(let obj of data){
+  for (let obj of data) {
     const showObj = {
       id: obj.show.id,
       name: obj.show.name,
       summary: obj.show.summary,
-    }
+    };
 
-    if(obj["image"] === null){
+    //console.log("obj.show.image = ", obj.show.image);
+
+    if (obj.show.image === null) {
       showObj["image"] = "https://tinyurl.com/tv-missing";
     } else {
       showObj["image"] = obj.show.image.medium;
@@ -44,8 +46,8 @@ async function getShowsByTerm(term) {
   }
 
   //image: obj.show.image.medium
-  console.log("Search result is ", resource, "data=", data);
-  console.log("showInfo = ", showInfo);
+  //console.log("Search result is ", resource, "data=", data);
+  //console.log("showInfo = ", showInfo);
   return showInfo;
 
 }
@@ -95,7 +97,7 @@ async function searchShowsAndDisplay() {
   displayShows(shows);
 }
 
-$searchForm.on("submit", async function handleSearchForm (evt) {
+$searchForm.on("submit", async function handleSearchForm(evt) {
   evt.preventDefault();
   await searchShowsAndDisplay();
 });
